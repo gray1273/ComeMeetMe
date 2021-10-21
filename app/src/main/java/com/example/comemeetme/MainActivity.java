@@ -2,9 +2,9 @@ package com.example.comemeetme;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -22,5 +22,15 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         });
+    }
+    @Override
+    protected void onPause() {
+        Log.i("Main Activity","Triggered onPause for main activity");
+        super.onPause();
+    }
+    @Override
+    protected void onResume() {
+        Log.i("Main Activity","Triggered onResume for main activity");
+        super.onResume();
     }
 }
