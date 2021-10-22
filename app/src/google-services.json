@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "483015281705",
+    "firebase_url": "https://comemeetme-32af7-default-rtdb.firebaseio.com",
+    "project_id": "comemeetme-32af7",
+    "storage_bucket": "comemeetme-32af7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483015281705:android:123b2bfa5d5c9656522038",
+        "android_client_info": {
+          "package_name": "com.example.comemeetme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "483015281705-8vo473qd9d8lfahsl3tvg748c88j8iut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkEMp45wkWdXpqjektpx3OwCbQJvYS0NM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "483015281705-8vo473qd9d8lfahsl3tvg748c88j8iut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
