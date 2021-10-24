@@ -1,8 +1,10 @@
 package com.example.comemeetme.ui.signup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +25,20 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.comemeetme.R;
 import com.example.comemeetme.databinding.FragmentSignupBinding;
+import com.example.comemeetme.ui.login.LoginFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
 public class signupFragment extends Fragment {
 
     private SignUpViewModel signUpViewModel;
     private FragmentSignupBinding binding;
+    private FirebaseAuth mAuth;
 
     @Nullable
     @Override
@@ -43,13 +54,95 @@ public class signupFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         signUpViewModel = new ViewModelProvider(this, new SignUpViewModelFactory())
                 .get(SignUpViewModel.class);
 
         final EditText usernameEditText = binding.username;
+        usernameEditText.setHint("e-mail");
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
+        EditText confirmEmail;
+
+        confirmEmail = usernameEditText;
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email1 = usernameEditText.getText().toString();
+                String email2 = confirmEmail.getText().toString();
+                if (email1.equals("") || email2.equals("")) {
+                    toastMessage("Please enter an E-mail");
+                } else {
+                    if (!email1.equals(email2)) {
+                        toastMessage("Emails do not match");
+                    } else {
+                        String pass1 = passwordEditText.getText().toString();
+                        String pass2 = passwordEditText.getText().toString();
+                        if (pass1.equals("") || pass2.equals("")) {
+                            toastMessage("Please enter a password");
+                        } else {
+                            if (!pass1.equals(pass2)) {
+                                toastMessage("Passwords do not match");
+                            } else {
+                                //Create new account using info
+                                if (pass1.length() < 6) {
+                                    toastMessage("Password is too short");
+                                } else {
+                                    //mAuth.createUserWithEmailAndPassword(email1, pass1);
+                                    mAuth.createUserWithEmailAndPassword(email1, pass1)
+                                            .addOnCompleteListener(
+                                                    new OnCompleteListener<AuthResult>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                                            if (!task.isSuccessful()) {
+                                                                try {
+                                                                    throw task.getException();
+                                                                }
+                                                                // if user enters wrong email.
+                                                                catch (FirebaseAuthWeakPasswordException weakPassword) {
+                                                                    Log.d("", "onComplete: weak_password");
+
+                                                                    toastMessage("Password is too weak");
+                                                                }
+                                                                // if user enters wrong password.
+                                                                catch (FirebaseAuthInvalidCredentialsException malformedEmail) {
+                                                                    Log.d("", "onComplete: malformed_email");
+
+                                                                    toastMessage("This is an incorrect E-mail");
+                                                                } catch (FirebaseAuthUserCollisionException existEmail) {
+                                                                    Log.d("", "onComplete: exist_email");
+
+                                                                    toastMessage("This E-mail is already taken, try signing in");
+                                                                } catch (Exception e) {
+                                                                    Log.d("", "onComplete: " + e.getMessage());
+                                                                }
+                                                            } else {
+                                                                toastMessage("Account Created");
+                                                                getActivity().getSupportFragmentManager().beginTransaction()
+                                                                        .replace(R.id.fragment_container_view, LoginFragment.class, null)
+                                                                        .addToBackStack(null)
+                                                                        .commit();
+                                                            }
+                                                        }
+                                                    }
+                                            );
+                                }
+                            }
+
+                        }
+
+
+                    }
+
+
+                }
+
+
+            }
+        });
+
 
         signUpViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<SignUpFormState>() {
             @Override
@@ -114,14 +207,7 @@ public class signupFragment extends Fragment {
             }
         });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                signUpViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
-            }
-        });
+
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
@@ -145,5 +231,8 @@ public class signupFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+    public void toastMessage(String message){
+        Toast.makeText(getActivity(),message,Toast.LENGTH_SHORT).show();
     }
 }

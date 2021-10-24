@@ -1,5 +1,6 @@
 package com.example.comemeetme.ui.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,12 +26,22 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.comemeetme.NewEventFragment;
 import com.example.comemeetme.R;
 import com.example.comemeetme.databinding.FragmentLoginBinding;
+import com.example.comemeetme.ui.signup.signupFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class LoginFragment extends Fragment {
 
     private LoginViewModel loginViewModel;
     private FragmentLoginBinding binding;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Nullable
     @Override
@@ -46,6 +57,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
@@ -53,6 +65,7 @@ public class LoginFragment extends Fragment {
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
+        Button buttonCreateAccount = view.findViewById(R.id.buttonCreateAccount);
 
         loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override
@@ -69,6 +82,8 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
+
+
 
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), new Observer<LoginResult>() {
             @Override
@@ -116,13 +131,58 @@ public class LoginFragment extends Fragment {
                 return false;
             }
         });
+        buttonCreateAccount.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, signupFragment.class, null).commit();
+
+            }
+        });
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("Log in", "Clicked login button");
-                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, NewEventFragment.class, null).commit();
+                String emailStr = usernameEditText.getText().toString();
+                String passStr = passwordEditText.getText().toString();
+                if (!emailStr.equals("") && !passStr.equals("")) {
+                    toastMessage("Signing in...");
+                    mAuth.signInWithEmailAndPassword(emailStr, passStr)
+                            .addOnCompleteListener(
+                                    new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                            if (!task.isSuccessful()) {
+                                                try {
+                                                    throw task.getException();
+                                                }
+                                                // if user enters wrong email.
+                                                catch (FirebaseAuthInvalidUserException invalidEmail) {
+                                                    Log.d(" ", "onComplete: invalid_email");
+
+                                                    toastMessage("The E-mail is invalid");
+                                                }
+                                                // if user enters wrong password.
+                                                catch (FirebaseAuthInvalidCredentialsException wrongPassword) {
+                                                    Log.d(":", "onComplete: wrong_password");
+
+                                                    toastMessage("The Password is incorrect");
+                                                } catch (Exception e) {
+                                                    Log.d("", "onComplete: " + e.getMessage());
+                                                }
+                                            } else {
+                                                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, NewEventFragment.class, null).commit();
+                                            }
+                                        }
+                                    });
+
+                } else {
+                    toastMessage("You did not enter the required information");
+                }
+
             }
+
+
         });
     }
 
@@ -147,5 +207,20 @@ public class LoginFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+    /*@Override
+    public void onStart(){
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        if(mAuthListener != null){
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }*/
+    public void toastMessage(String message){
+        Toast.makeText(getActivity(),message,Toast.LENGTH_SHORT).show();
     }
 }

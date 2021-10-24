@@ -21,7 +21,10 @@ import androidx.lifecycle.Lifecycle;
 
 import com.example.comemeetme.ui.login.LoginFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -80,7 +83,7 @@ public class NewEventFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
 // Create an ArrayAdapter using the string array and a default spinner layout
@@ -133,19 +136,43 @@ public class NewEventFragment extends Fragment {
                     //mDatabase.child("Event Name").setValue(eventNameStr);
                 if(isAChar) {
                     mDatabase = mDatabase.child(eventNameStr);
-                    mDatabase.child("Event Location").setValue(eventLocationStr);
+                    mDatabase.child("Event Location").setValue(eventLocationStr).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            CharSequence text = "Error: Failed to create event";
+                            int duration = Toast.LENGTH_SHORT;
+
+                            Toast toast = Toast.makeText(getActivity(), text, duration);
+                            toast.show();
+                        }
+                    });
                     mDatabase.child("Event Description").setValue(descStr);
                     mDatabase.child("Event End Time").setValue(endTimeStr);
                     mDatabase.child("Number of People").setValue(numPeopleStr);
                     mDatabase.child("Is Private?").setValue(isPriv);
-                    mDatabase.child("Event Type").setValue(type.getText());
-                    //Process next fragment
+                    mDatabase.child("Event Owner").setValue(user.getEmail());
+                    mDatabase.child("Event Type").setValue(type.getText()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            CharSequence text = "Event Created";
+                            int duration = Toast.LENGTH_SHORT;
 
-                    CharSequence text = "Event Created";
-                    int duration = Toast.LENGTH_SHORT;
+                            Toast toast = Toast.makeText(getActivity(), text, duration);
+                            toast.show();
+                            //Launch next fragment
 
-                    Toast toast = Toast.makeText(getActivity(), text, duration);
-                    toast.show();
+                            getActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container_view, LoginFragment.class, null)
+                                    .addToBackStack(null)
+                                    .commit();
+
+
+                        }
+
+                    });
+
+
+
                 }else{
 
                     CharSequence text = "Error: Event Name has to contain a character or number";
