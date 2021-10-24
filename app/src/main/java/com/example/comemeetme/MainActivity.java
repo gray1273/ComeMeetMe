@@ -13,13 +13,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.fragment_container_view, LoginFragment.class, null)
                 .commit();
+
+
     }
+
     @Override
     protected void onPause() {
         Log.i("Main Activity","Triggered onPause for main activity");

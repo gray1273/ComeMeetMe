@@ -3,6 +3,7 @@ package com.example.comemeetme.ui.login;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -119,7 +120,8 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, NewEventFragment.class, null);
+                Log.i("Log in", "Clicked login button");
+                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, NewEventFragment.class, null).commit();
             }
         });
     }
