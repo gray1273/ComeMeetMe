@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         if(user == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
-                    .add(R.id.fragment_container_view, EventListFragment.class, null)
+                    .add(R.id.fragment_container_view, LoginFragment.class, null)
                     .commit();
         }else{
 
