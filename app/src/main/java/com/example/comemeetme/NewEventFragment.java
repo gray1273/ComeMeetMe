@@ -162,7 +162,7 @@ public class NewEventFragment extends Fragment {
                             //Launch next fragment
 
                             getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container_view, LoginFragment.class, null)
+                                    .replace(R.id.fragment_container_view, EventListFragment.class, null)
                                     .addToBackStack(null)
                                     .commit();
 

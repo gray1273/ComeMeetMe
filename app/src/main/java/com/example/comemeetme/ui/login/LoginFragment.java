@@ -27,6 +27,7 @@ import com.example.comemeetme.NewEventFragment;
 import com.example.comemeetme.R;
 import com.example.comemeetme.databinding.FragmentLoginBinding;
 import com.example.comemeetme.ui.signup.signupFragment;
+import com.example.comemeetme.EventListFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -171,7 +172,7 @@ public class LoginFragment extends Fragment {
                                                     Log.d("", "onComplete: " + e.getMessage());
                                                 }
                                             } else {
-                                                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, NewEventFragment.class, null).commit();
+                                                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, EventListFragment.class, null).commit();
                                             }
                                         }
                                     });

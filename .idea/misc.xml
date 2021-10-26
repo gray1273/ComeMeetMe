@@ -7,10 +7,11 @@
         <entry key="..\:/Users/maxgi/AndroidStudioProjects/ComeMeetMe/app/src/main/res/layout/fragment_blank.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.20969202898550723" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.20969202898550723" />
-        <entry key="app/src/main/res/layout/fragment_event_list.xml" value="0.143359375" />
+        <entry key="app/src/main/res/layout/fragment_event_list.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_my_account.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_new_event.xml" value="0.30106391576698605" />
+        <entry key="app/src/main/res/layout/fragment_update.xml" value="0.25" />
       </map>
     </option>
   </component>
