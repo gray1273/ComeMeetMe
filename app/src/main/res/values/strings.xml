@@ -20,5 +20,5 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
-
+    <string name="mapbox_access_token">pk.eyJ1IjoiY2FsZWItZ2FydmV5IiwiYSI6ImNrdDMzZ2pmZTB2amYyb28zaTlicDUyeWkifQ.RiJylYVu9Sxxu2Z7d0BJUg</string>
 </resources>
