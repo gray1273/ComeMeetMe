@@ -156,11 +156,8 @@ public class NewEventFragment extends Fragment {
                         public void onSuccess(Void aVoid) {
                             CharSequence text = "Event Created";
                             int duration = Toast.LENGTH_SHORT;
-
                             Toast toast = Toast.makeText(getActivity(), text, duration);
                             toast.show();
-                            //Launch next fragment
-
                             getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.fragment_container_view, EventListFragment.class, null)
                                     .addToBackStack(null)

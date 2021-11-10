@@ -160,7 +160,9 @@ public class EventListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String title = eventName.getText().toString();
-                title = title.substring(12);
+                //title = title.substring(12);
+                Log.i("title name = ",title);
+                toastMessage(title);
                 if(title.equalsIgnoreCase("Test")){
                     toastMessage("Please do not delete the test event");
                 }else{
@@ -168,7 +170,7 @@ public class EventListFragment extends Fragment {
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
                     mDatabase = mDatabase.child(title);
                     mDatabase.removeValue();
-                    
+
                     toastMessage("Event Deleted");
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container_view, EventListFragment.class, null)
