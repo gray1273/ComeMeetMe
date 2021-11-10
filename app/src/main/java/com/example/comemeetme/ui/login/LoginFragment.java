@@ -1,6 +1,5 @@
 package com.example.comemeetme.ui.login;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,18 +22,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.comemeetme.NewEventFragment;
+import com.example.comemeetme.MapFragment;
 import com.example.comemeetme.R;
 import com.example.comemeetme.databinding.FragmentLoginBinding;
 import com.example.comemeetme.ui.signup.signupFragment;
-import com.example.comemeetme.EventListFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.google.firebase.auth.FirebaseUser;
 
 
 public class LoginFragment extends Fragment {
@@ -172,7 +169,7 @@ public class LoginFragment extends Fragment {
                                                     Log.d("", "onComplete: " + e.getMessage());
                                                 }
                                             } else {
-                                                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, EventListFragment.class, null).commit();
+                                                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container_view, MapFragment.class, null).commit();
                                             }
                                         }
                                     });

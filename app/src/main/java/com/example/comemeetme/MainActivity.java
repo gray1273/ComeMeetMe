@@ -1,14 +1,11 @@
 package com.example.comemeetme;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.comemeetme.ui.login.LoginFragment;
-import com.example.comemeetme.ui.signup.signupFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -18,9 +15,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent =  new Intent(this, MapsActivity.class);
-        startActivity(intent);
-        /*if(user == null) {
+        if(user == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container_view, LoginFragment.class, null)
@@ -29,10 +24,10 @@ public class MainActivity extends AppCompatActivity {
 
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
-                    .add(R.id.fragment_container_view, myAccountFragment.class, null)
+                    .add(R.id.fragment_container_view, MapFragment.class, null)
                     .commit();
         }
-*/
+
     }
 
     @Override
