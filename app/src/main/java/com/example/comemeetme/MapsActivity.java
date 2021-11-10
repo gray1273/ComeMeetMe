@@ -10,36 +10,56 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.type.LatLng;
 import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
+import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.services.api.geocoding.v5.GeocodingCriteria;
+import com.mapbox.services.api.geocoding.v5.MapboxGeocoding;
+import com.mapbox.services.api.geocoding.v5.models.CarmenFeature;
+import com.mapbox.services.api.geocoding.v5.models.GeocodingResponse;
+import com.mapbox.services.commons.models.Position;
 import com.mapzen.android.lost.api.LocationRequest;
+
 
 import java.util.List;
 import java.util.Objects;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 import static androidx.databinding.DataBindingUtil.setContentView;
 import static com.mapbox.mapboxsdk.Mapbox.getApplicationContext;
 
-public class MapsActivity {
+public class MapsActivity extends AppCompatActivity implements LocationEngineCallback<LocationEngineResult>,
+        PermissionsListener, View.OnClickListener{
+    private final int ENABLE_GPS_REQUEST_CODE = 1;
     private PermissionsManager mPermissionsManager;
     private MapView mMapView;
     private MapboxMap mMapboxMap;
@@ -74,7 +94,7 @@ public class MapsActivity {
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the MapView.
-        Mapbox.getInstance(this, BuildConfig.MapboxAccessToken);
+        Mapbox.getInstance(this, "pk.eyJ1IjoibmdyYXk3NTciLCJhIjoiY2t0MW5wbW5mMDBnMjJub3didno2cGs1ciJ9.JQdbiwopyVcUaV-mqLFZwg");
 
         setContentView(R.layout.activity_maps);
 
