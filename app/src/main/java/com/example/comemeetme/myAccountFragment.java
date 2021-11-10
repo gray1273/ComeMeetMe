@@ -114,12 +114,14 @@ public class myAccountFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 //startActivity(new Intent(MainActivity.this,loginActivity.class));
-                mAuth.signOut();
+               mAuth.signOut();
                 toastMessage("Signing out...");
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container_view, LoginFragment.class, null)
                         .addToBackStack(null)
                         .commit();
+
+
 
             }
         });

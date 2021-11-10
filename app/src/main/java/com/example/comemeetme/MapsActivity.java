@@ -213,4 +213,16 @@ public class MapsActivity extends AppCompatActivity implements LocationEngineCal
             }
         }
     }
+    @Override
+    public void onSuccess(LocationEngineResult result) {
+
+    }
+    @Override
+    public void onFailure(@NonNull Exception exception) {
+
+    }
+    @Override
+    public void onClick(View view) {
+
+    }
 }

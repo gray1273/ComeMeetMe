@@ -1,5 +1,7 @@
 package com.example.comemeetme;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -16,7 +18,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if(user == null) {
+        Intent intent =  new Intent(this, MapsActivity.class);
+        startActivity(intent);
+        /*if(user == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container_view, LoginFragment.class, null)
@@ -28,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.fragment_container_view, myAccountFragment.class, null)
                     .commit();
         }
-
+*/
     }
 
     @Override
