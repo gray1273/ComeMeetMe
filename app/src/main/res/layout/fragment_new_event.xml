@@ -28,7 +28,7 @@
         android:layout_width="286dp"
         android:layout_height="48dp"
         android:ems="10"
-        android:hint="Event Location"
+        android:hint="Event Address"
         android:inputType="textPostalAddress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,31 +36,19 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextEventName"
         app:layout_constraintVertical_bias="0.034" />
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="283dp"
-        android:layout_height="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPostalAddress"
-        app:layout_constraintVertical_bias="0.029"
-        tools:ignore="SpeakableTextPresentCheck" />
-
     <EditText
         android:id="@+id/editTextEventDescriptionMultiLine"
         android:layout_width="281dp"
         android:layout_height="134dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:gravity="start|top"
         android:hint="Event Description"
         android:inputType="textMultiLine"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner"
-        app:layout_constraintVertical_bias="0.047" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextPostalAddress" />
 
     <EditText
         android:id="@+id/editTextNumber"
