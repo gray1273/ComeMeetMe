@@ -325,6 +325,7 @@ public class MapFragment extends Fragment {
                         temp.put("Event End Time", snapshot.child("Event End Time").getValue(String.class));
                         temp.put("Number of People", snapshot.child("Number of People").getValue(String.class));
                         temp.put("Event Owner", snapshot.child("Event Owner").getValue(String.class));
+                        temp.put("Original Location", snapshot.child("Original Location").getValue(String.class));
 
 
                         out.add(temp);

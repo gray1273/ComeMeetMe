@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,9 +24,20 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.mapbox.services.api.geocoding.v5.GeocodingCriteria;
+import com.mapbox.services.api.geocoding.v5.MapboxGeocoding;
+import com.mapbox.services.api.geocoding.v5.models.CarmenFeature;
+import com.mapbox.services.api.geocoding.v5.models.GeocodingResponse;
+import com.mapbox.services.commons.models.Position;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -97,7 +110,7 @@ public class EventListFragment extends Fragment {
 
         eventName.setText(tempMap.get("Event Name"));
         EditText locationTV = view.findViewById(R.id.editTextLocationUpdate);
-        locationTV.setText(tempMap.get("Event Location"));
+        locationTV.setText(tempMap.get("Original Location"));
         description.setText(tempMap.get("Event Description"));
         tvTime.setText(tempMap.get("Event End Time"));
         numPar.setText(tempMap.get("Number of People"));
@@ -118,8 +131,10 @@ public class EventListFragment extends Fragment {
                 output[2] =  tvTime.getText().toString();
                 output[3] =  numPar.getText().toString();
                 output[4] =  description.getText().toString();
+                geocode(output[1],output[0]);
+
                 mDatabase = FirebaseDatabase.getInstance().getReference().child("events").child(output[0]);
-                mDatabase.child("Event Location").setValue(output[1]);
+                mDatabase.child("Original Location").setValue(output[1]);
                 mDatabase.child("Event End Time").setValue(output[2]);
                 mDatabase.child("Event Description").setValue(output[4]);
                 mDatabase.child("Number of People").setValue(output[3]);
@@ -165,4 +180,51 @@ public class EventListFragment extends Fragment {
     public void toastMessage(String message){
         Toast.makeText(getActivity(),message,Toast.LENGTH_SHORT).show();
     }
+    public void geocode(String str, String name){
+
+        try {
+            MapboxGeocoding client = new MapboxGeocoding.Builder()
+                    .setAccessToken(getString(R.string.mapbox_access_token))
+                    .setLocation(str).setGeocodingType(GeocodingCriteria.TYPE_ADDRESS)
+                    .build();
+
+            client.enqueueCall(new Callback<GeocodingResponse>() {
+
+                @Override
+                public void onResponse(@NonNull Call<GeocodingResponse> call, @NonNull Response<GeocodingResponse> response) {
+                    DatabaseReference mDatabase;
+                    boolean isAChar = false;
+                    mDatabase = FirebaseDatabase.getInstance().getReference().child("events").child(name);
+                    GeocodingResponse responseBody = response.body();
+                    if (responseBody != null) {
+                        List<CarmenFeature> results = responseBody.getFeatures();
+                        if (results != null && results.size() > 0) {
+                            // Log the first results position.
+                            Position firstResultPos = results.get(0).asPosition();
+                            String eventLocationRes = firstResultPos.toString();
+                            //toastMessage("Location is " + eventLocationRes);
+                            mDatabase.child("Event Location").setValue(eventLocationRes);
+
+                        }
+
+                    }
+                }
+
+
+                @Override
+                public void onFailure(@NonNull Call<GeocodingResponse> call, @NonNull Throwable throwable) {
+                    // log t.getMessage()
+                    toastMessage("Error, failed to locate address, please try again");
+                    return;
+                }
+            });
+            } catch (Exception e) {
+            Timber.tag("").e("Could not locate this address");
+            e.printStackTrace();
+            return;
+        }
+
+
+    }
+
 }

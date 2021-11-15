@@ -122,11 +122,11 @@ public class NewEventFragment extends Fragment {
                 EditText description = view.findViewById(R.id.editTextEventDescriptionMultiLine);
                 EditText numPeople = view.findViewById(R.id.editTextNumber);
                 EditText endTime = view.findViewById(R.id.editTextTime);
-                CheckBox isPrivate = view.findViewById(R.id.checkBox);
+               // CheckBox isPrivate = view.findViewById(R.id.checkBox);
                 TextView type = view.findViewById(R.id.HelperForSpinner);
 
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
-                    boolean isPriv = isPrivate.isChecked();
+                    //boolean isPriv = isPrivate.isChecked();
                     String eventNameStr = eventName.getText().toString();
                     String descStr = description.getText().toString();
                     String numPeopleStr = numPeople.getText().toString();
@@ -169,19 +169,19 @@ public class NewEventFragment extends Fragment {
                                     //mDatabase.child("Event Name").setValue(eventNameStr);
                                     if (isAChar) {
                                         mDatabase = mDatabase.child(eventNameStr);
-                                        toastMessage("eventLocationStr");
+                                        //toastMessage("eventLocationStr");
                                         mDatabase.child("Event Location").setValue(eventLocationRes).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 toastMessage("Error: failed to create event");
                                             }
                                         });
+                                        mDatabase.child("Original Location").setValue(eventLocationStr);
                                         mDatabase.child("Event Description").setValue(descStr);
                                         mDatabase.child("Event End Time").setValue(endTimeStr);
                                         mDatabase.child("Number of People").setValue(numPeopleStr);
-                                        mDatabase.child("Is Private?").setValue(isPriv);
-                                        mDatabase.child("Event Owner").setValue(user.getEmail());
-                                        mDatabase.child("Event Type").setValue(type.getText()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        //mDatabase.child("Is Private?").setValue(isPriv);
+                                        mDatabase.child("Event Owner").setValue(user.getEmail()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 //toastMessage("Event Created");
