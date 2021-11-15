@@ -101,25 +101,38 @@ public class MapFragment extends Fragment {
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        Location location = task.getResult();
-                        if (location == null) {
+                    LatLng latLng = new LatLng(34.018321, -118.239886);
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(latLng)      // Sets the center of the map to Mountain View
+                            .zoom(10)                  // Sets the tilt of the camera to 30 degrees
+                            .build();                   // Creates a CameraPosition from the builder
+                    mapboxMap.setCameraPosition(cameraPosition);
+                }else {
+                    mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            Location location = task.getResult();
+                            if (location == null) {
 //                            requestNewLocationData();
-                        } else {
-                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                            CameraPosition cameraPosition = new CameraPosition.Builder()
-                                    .target(latLng)      // Sets the center of the map to Mountain View
-                                    .zoom(10)                  // Sets the tilt of the camera to 30 degrees
-                                    .build();                   // Creates a CameraPosition from the builder
+                                LatLng latLng = new LatLng(34.018321, -118.239886);
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(latLng)      // Sets the center of the map to Mountain View
+                                        .zoom(10)                  // Sets the tilt of the camera to 30 degrees
+                                        .build();                   // Creates a CameraPosition from the builder
 
-                            mapboxMap.setCameraPosition(cameraPosition);
+                                mapboxMap.setCameraPosition(cameraPosition);
+                            } else {
+                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(latLng)      // Sets the center of the map to Mountain View
+                                        .zoom(10)                  // Sets the tilt of the camera to 30 degrees
+                                        .build();                   // Creates a CameraPosition from the builder
+
+                                mapboxMap.setCameraPosition(cameraPosition);
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 List<Feature> symbolLayerIconFeatureList = new ArrayList<>();
 
 
