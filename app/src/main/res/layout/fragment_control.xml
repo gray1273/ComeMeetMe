@@ -11,6 +11,7 @@
         android:id="@+id/buttonMyAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:background="@color/mapbox_blue"
         android:shadowColor="#3F51B5"
         android:text="My Account"

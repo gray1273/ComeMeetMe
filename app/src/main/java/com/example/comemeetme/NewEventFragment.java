@@ -186,7 +186,7 @@ public class NewEventFragment extends Fragment {
                                             public void onSuccess(Void aVoid) {
                                                 //toastMessage("Event Created");
                                                 getActivity().getSupportFragmentManager().beginTransaction()
-                                                        .replace(R.id.fragment_container_view, EventListFragment.class, null)
+                                                        .replace(R.id.fragment_container_view, MapFragment.class, null)
                                                         .addToBackStack(null)
                                                         .commit();
 

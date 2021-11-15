@@ -23,6 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link EventListFragment#newInstance} factory method to
@@ -73,63 +76,37 @@ public class EventListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle bundle = this.getArguments();
+        long symbolID = bundle.getLong("symbolID");
+        Log.i("Symbol ID: " , ""+symbolID);
+        HashMap<String, String> tempMap = new HashMap<>();
+        ArrayList<HashMap<String, String>> importedMaps = (ArrayList<HashMap<String, String>>) bundle.getSerializable("array");
+        for(int i = 0; i < importedMaps.size(); i++){
+
+            tempMap = importedMaps.get(i);
+            if(tempMap.get("symbolID").equals(""+symbolID)){
+                break;
+            }
+
+        }
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
         TextView eventName = (TextView) view.findViewById(R.id.textViewEventName);
         EditText description = view.findViewById(R.id.editTextDesc);
         EditText tvTime = view.findViewById(R.id.editTextTimeUpdate);
         EditText numPar = view.findViewById(R.id.editTextNumParticipants);
 
-        eventName.setText("Event Name Here");
+        eventName.setText(tempMap.get("Event Name"));
         EditText locationTV = view.findViewById(R.id.editTextLocationUpdate);
+        locationTV.setText(tempMap.get("Event Location"));
+        description.setText(tempMap.get("Event Description"));
+        tvTime.setText(tempMap.get("Event End Time"));
+        numPar.setText(tempMap.get("Number of People"));
         Button updateButton = (Button) view.findViewById(R.id.updateButton);
-        Button toAdd = view.findViewById(R.id.buttonToAddEvent);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        Query mQuery;
-        DatabaseReference mDatabase;
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
 
 
-    mDatabase.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-        @Override
-        public void onComplete(@NonNull Task<DataSnapshot> task) {
-            if (!task.isSuccessful()) {
-                toastMessage("No events in database");
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, NewEventFragment.class, null)
-                        .addToBackStack(null)
-                        .commit();
-            } else {
-                String total = String.valueOf(task.getResult().getValue());
-                String eventNameStr = "Event Name: " + total.substring(total.indexOf("{") + 1, total.indexOf("="));
-
-                String location = total.substring(total.indexOf("Event Location="), total.indexOf("Number of People") - 2);
-                locationTV.setText(location.substring(15));
-
-                String time = total.substring(total.indexOf("Event End Time="), total.indexOf("Is Private?") - 2);
-                tvTime.setText(time.substring(15));
-                String numPeople = total.substring(total.indexOf("Number of People="), total.indexOf("}"));
-                numPar.setText(numPeople.substring(17));
-                String desc = total.substring(total.indexOf("Event Description="), total.indexOf("Event Owner=") - 2);
-                description.setText(desc.substring(18));
-                eventName.setText(eventNameStr.substring(12));
-                Log.d("firebase", String.valueOf(task.getResult().getValue()));
-            }
-        }
-    });
 
 
-        //eventName.setText(mDatabase.getKey());
 
-
-        toAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, NewEventFragment.class, null)
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,7 +125,7 @@ public class EventListFragment extends Fragment {
                 mDatabase.child("Number of People").setValue(output[3]);
                 toastMessage("Entry has been updated");
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, EventListFragment.class, null)
+                        .replace(R.id.fragment_container_view, MapFragment.class, null)
                         .addToBackStack(null)
                         .commit();
 
@@ -173,7 +150,7 @@ public class EventListFragment extends Fragment {
 
                     toastMessage("Event Deleted");
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container_view, EventListFragment.class, null)
+                            .replace(R.id.fragment_container_view, MapFragment.class, null)
                             .addToBackStack(null)
                             .commit();
                 }

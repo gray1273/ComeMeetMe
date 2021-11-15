@@ -1,9 +1,5 @@
 package com.example.comemeetme;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -46,6 +42,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
@@ -56,11 +53,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+
 
 public class MapFragment extends Fragment {
 
     private MapView mapView;
     private ArrayList<HashMap<String, String>> output = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> toSend = new ArrayList<>();
     private static final String SOURCE_ID = "SOURCE_ID";
     private static final String ICON_ID = "ICON_ID";
     private static final String LAYER_ID = "LAYER_ID";
@@ -79,7 +82,6 @@ public class MapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
 
         getEvents();
         Mapbox.getInstance(getContext().getApplicationContext(),getString(R.string.mapbox_access_token));
@@ -161,7 +163,9 @@ public class MapFragment extends Fragment {
         {
             @Override
             public void onClick(View v) {
+
                 addPins();
+                toastMessage("Events displayed");
             }
 
 
@@ -170,13 +174,7 @@ public class MapFragment extends Fragment {
         return view;
     }
     public void addPins(){
-        ArrayList<ArrayList<Double>> coords = updateMap();
 
-        // Use a layer manager here
-        // create symbol manager object
-
-
-        // add click listeners if desired
         SymbolManager symbolManager = new SymbolManager(mapView, mapboxMap1, mapboxMap1.getStyle());
 
 
@@ -188,22 +186,59 @@ public class MapFragment extends Fragment {
         symbolManager.setIconAllowOverlap(true);
         symbolManager.setIconIgnorePlacement(true);
 
-        for(int i = 0; i < coords.size(); i++){
+        ArrayList<HashMap<String, String>> output1 = output;
+        Log.i("Event number " , ""+output1.size());
 
-            ArrayList<Double> temp = coords.get(i);
-            Log.i("Coords " + i, temp.get(0) + ", " + temp.get(1));
-            // Add symbol at specified lat/lon
-            toastMessage("" + coords.get(0));
+
+        for(int i = 0; i < output1.size(); i++){
+
+            HashMap<String, String> temp = output1.get(i);
+            String position = temp.get("Event Location");
+            Log.i("Event Locations: " , position);
+            //toastMessage(position);
+            String longi = position.substring(position.indexOf("longitude="), position.indexOf("latitude=") -3);
+            String lat = position.substring(position.indexOf("latitude="), position.indexOf("altitude=") -3);
+            longi = longi.substring(10);
+            lat = lat.substring(9);
+            double longitude = Double.parseDouble(longi);
+            double latitude = Double.parseDouble(lat);
             Symbol symbol = symbolManager.create(new SymbolOptions()
-                    .withLatLng(new LatLng(temp.get(1), temp.get(0)))
+                    .withLatLng(new LatLng(latitude, longitude))
                     .withIconImage(ICON_ID)
                     .withIconSize(2.0f));
 
+            temp.put("symbolID", ""+symbol.getId());
+            toSend.add(temp);
 
         }
 
-    }
 
+        symbolManager.addClickListener(new OnSymbolClickListener() {
+            @Override
+            public void onAnnotationClick(Symbol symbol) {
+                Fragment tempFrag = new EventListFragment();
+                Bundle bundle = new Bundle();
+                bundle.putLong("symbolID", symbol.getId());
+                bundle.putSerializable("array", toSend);
+                tempFrag.setArguments(bundle);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container_view, tempFrag, null)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+
+        // Use a layer manager here
+        // create symbol manager object
+
+
+        // add click listeners if desired
+
+
+
+
+    }
     private void requestNewLocationData() {
 
         // Initializing LocationRequest
@@ -271,40 +306,7 @@ public class MapFragment extends Fragment {
 
     }
 
-    public ArrayList<ArrayList<Double>> updateMap(){
 
-        ArrayList<HashMap<String, String>> output1 = output;
-        Log.i("Event number " , ""+output1.size());
-        ArrayList<ArrayList<Double>> out = new ArrayList<>();
-        //ArrayList<Double> coords = new ArrayList<>();
-
-        for(int i = 0; i < output1.size(); i++){
-            ArrayList<Double> coords = new ArrayList<>();
-            HashMap<String, String> temp = output1.get(i);
-            String position = temp.get("Event Location");
-            Log.i("Event Locations: " , position);
-            //toastMessage(position);
-            String longi = position.substring(position.indexOf("longitude="), position.indexOf("latitude=") -3);
-            String lat = position.substring(position.indexOf("latitude="), position.indexOf("altitude=") -3);
-            longi = longi.substring(10);
-            lat = lat.substring(9);
-            double longitude = Double.parseDouble(longi);
-            double latitude = Double.parseDouble(lat);
-            //toastMessage(lat);
-            coords.add(longitude);
-            coords.add(latitude);
-            out.add(coords);
-
-
-        }
-
-        return out;
-
-
-
-
-
-    }
     public void getEvents(){
         DatabaseReference mDatabase;
         mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
