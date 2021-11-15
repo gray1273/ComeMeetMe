@@ -1,5 +1,6 @@
 package com.example.comemeetme.ui.login;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -67,6 +69,11 @@ public class LoginFragment extends Fragment {
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
         Button buttonCreateAccount = view.findViewById(R.id.buttonCreateAccount);
+
+
+        ActivityCompat.requestPermissions(getActivity(), new String[]{
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION}, 44);
 
         loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override

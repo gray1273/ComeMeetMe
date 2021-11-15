@@ -1,6 +1,11 @@
 package com.example.comemeetme;
 
 
+import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
@@ -53,11 +58,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
-
 
 public class MapFragment extends Fragment {
 
@@ -101,7 +101,7 @@ public class MapFragment extends Fragment {
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for ActivityCompat#requestPermissions for more details.
-                    LatLng latLng = new LatLng(34.018321, -118.239886);
+                    LatLng latLng = new LatLng(39.103119, -84.512016);
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(latLng)      // Sets the center of the map to Mountain View
                             .zoom(10)                  // Sets the tilt of the camera to 30 degrees
@@ -114,7 +114,7 @@ public class MapFragment extends Fragment {
                             Location location = task.getResult();
                             if (location == null) {
 //                            requestNewLocationData();
-                                LatLng latLng = new LatLng(34.018321, -118.239886);
+                                LatLng latLng = new LatLng(39.103119, -84.512016);
                                 CameraPosition cameraPosition = new CameraPosition.Builder()
                                         .target(latLng)      // Sets the center of the map to Mountain View
                                         .zoom(10)                  // Sets the tilt of the camera to 30 degrees

@@ -16,8 +16,8 @@
         mapbox:layout_constraintHeight_percent="0.9"
         mapbox:layout_constraintStart_toStartOf="parent"
         mapbox:layout_constraintTop_toTopOf="parent"
-        mapbox:mapbox_cameraTargetLat="-32.557013"
-        mapbox:mapbox_cameraTargetLng="-56.149056"
+        mapbox:mapbox_cameraTargetLat="39.103119"
+        mapbox:mapbox_cameraTargetLng="-84.512016"
         mapbox:mapbox_cameraZoom="5.526846" />
 
     <Button
