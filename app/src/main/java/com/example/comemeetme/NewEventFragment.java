@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import com.mapbox.services.api.geocoding.v5.MapboxGeocoding;
+import com.mapbox.services.api.geocoding.v5.models.CarmenFeature;
+import com.mapbox.services.api.geocoding.v5.models.GeocodingResponse;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -29,6 +32,23 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.type.LatLng;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.services.api.geocoding.v5.GeocodingCriteria;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import com.mapbox.services.commons.models.Position;
+
+import java.util.List;
+
+
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -85,15 +105,6 @@ public class NewEventFragment extends Fragment {
                              Bundle savedInstanceState) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
-        Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
-// Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter adapter = new ArrayAdapter(this.getContext(), android.R.layout.simple_spinner_item, eventTypes);
-// Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
-        // spinner.setOnItemSelectedListener(this);
-
 
         Button mButton = view.findViewById(R.id.buttonCreateEvent);
         mButton.setOnClickListener(new View.OnClickListener()
@@ -104,6 +115,7 @@ public class NewEventFragment extends Fragment {
                 Log.i("Test", "Recorded onClick");
                 DatabaseReference mDatabase;
                 boolean isAChar = false;
+                MapboxGeocoding mapboxGeocoding;
 
                 EditText eventName = view.findViewById(R.id.editTextEventName);
                 EditText eventLocation = view.findViewById(R.id.editTextTextPostalAddress);
@@ -120,75 +132,106 @@ public class NewEventFragment extends Fragment {
                     String numPeopleStr = numPeople.getText().toString();
                     String eventLocationStr = eventLocation.getText().toString();
                     String endTimeStr = endTime.getText().toString();
+                try {
+                    MapboxGeocoding client = new MapboxGeocoding.Builder()
+                            .setAccessToken(getString(R.string.mapbox_access_token))
+                            .setLocation(eventLocationStr).setGeocodingType(GeocodingCriteria.TYPE_ADDRESS)
+                            .build();
 
-                    for(int i = 0; i < eventNameStr.length(); i++){
-                        if(eventNameStr.charAt(i) >= 'a' && eventNameStr.charAt(i) <= 'z'){
-                            isAChar = true;
-                            break;
-                        }else if(eventNameStr.charAt(i) >= 'A' && eventNameStr.charAt(i) <= 'Z'){
-                            isAChar = true;
-                            break;
-                        }else if(eventNameStr.charAt(i) >= '0' && eventNameStr.charAt(i) <= '9'){
-                            isAChar = true;
-                            break;
-                        }
-                    }
-                    //mDatabase.child("Event Name").setValue(eventNameStr);
-                if(isAChar) {
-                    mDatabase = mDatabase.child(eventNameStr);
-                    mDatabase.child("Event Location").setValue(eventLocationStr).addOnFailureListener(new OnFailureListener() {
+                    client.enqueueCall(new Callback<GeocodingResponse>() {
+
                         @Override
-                        public void onFailure(@NonNull Exception e) {
-                            CharSequence text = "Error: Failed to create event";
-                            int duration = Toast.LENGTH_SHORT;
+                        public void onResponse(@NonNull Call<GeocodingResponse> call, @NonNull Response<GeocodingResponse> response) {
+                            DatabaseReference mDatabase;
+                            boolean isAChar = false;
+                            mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
+                            GeocodingResponse responseBody = response.body();
+                            if (responseBody != null) {
+                                List<CarmenFeature> results = responseBody.getFeatures();
+                                if (results != null && results.size() > 0) {
+                                    // Log the first results position.
+                                    Position firstResultPos = results.get(0).asPosition();
+                                    String eventLocationRes = firstResultPos.toString();
+                                    //toastMessage("Location is " + eventLocationRes);
 
-                            Toast toast = Toast.makeText(getActivity(), text, duration);
-                            toast.show();
-                        }
-                    });
-                    mDatabase.child("Event Description").setValue(descStr);
-                    mDatabase.child("Event End Time").setValue(endTimeStr);
-                    mDatabase.child("Number of People").setValue(numPeopleStr);
-                    mDatabase.child("Is Private?").setValue(isPriv);
-                    mDatabase.child("Event Owner").setValue(user.getEmail());
-                    mDatabase.child("Event Type").setValue(type.getText()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            CharSequence text = "Event Created";
-                            int duration = Toast.LENGTH_SHORT;
-                            Toast toast = Toast.makeText(getActivity(), text, duration);
-                            toast.show();
-                            getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container_view, EventListFragment.class, null)
-                                    .addToBackStack(null)
-                                    .commit();
+                                    for (int i = 0; i < eventNameStr.length(); i++) {
+                                        if (eventNameStr.charAt(i) >= 'a' && eventNameStr.charAt(i) <= 'z') {
+                                            isAChar = true;
+                                            break;
+                                        } else if (eventNameStr.charAt(i) >= 'A' && eventNameStr.charAt(i) <= 'Z') {
+                                            isAChar = true;
+                                            break;
+                                        } else if (eventNameStr.charAt(i) >= '0' && eventNameStr.charAt(i) <= '9') {
+                                            isAChar = true;
+                                            break;
+                                        }
+                                    }
+                                    //mDatabase.child("Event Name").setValue(eventNameStr);
+                                    if (isAChar) {
+                                        mDatabase = mDatabase.child(eventNameStr);
+                                        toastMessage("eventLocationStr");
+                                        mDatabase.child("Event Location").setValue(eventLocationRes).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                toastMessage("Error: failed to create event");
+                                            }
+                                        });
+                                        mDatabase.child("Event Description").setValue(descStr);
+                                        mDatabase.child("Event End Time").setValue(endTimeStr);
+                                        mDatabase.child("Number of People").setValue(numPeopleStr);
+                                        mDatabase.child("Is Private?").setValue(isPriv);
+                                        mDatabase.child("Event Owner").setValue(user.getEmail());
+                                        mDatabase.child("Event Type").setValue(type.getText()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                //toastMessage("Event Created");
+                                                getActivity().getSupportFragmentManager().beginTransaction()
+                                                        .replace(R.id.fragment_container_view, EventListFragment.class, null)
+                                                        .addToBackStack(null)
+                                                        .commit();
 
 
-                        }
+                                            }
 
-                    });
+                                        });
 
 
+                                    } else {
 
-                }else{
+                                        toastMessage("Error: Event Name has to contain a character or number");
+                                    }
 
-                    CharSequence text = "Error: Event Name has to contain a character or number";
-                    int duration = Toast.LENGTH_SHORT;
+                                }
+                            }
 
-                    Toast toast = Toast.makeText(getActivity(), text, duration);
-                    toast.show();
+
                 }
+                    @Override
+                    public void onFailure(@NonNull Call<GeocodingResponse> call, @NonNull Throwable throwable) {
+                        // log t.getMessage()
+                        toastMessage("Error, failed to locate address, please try again");
+                        return;
+                    }
+                });
+                } catch (Exception e) {
+                    Timber.tag("").e("Could not locate this address");
+                     e.printStackTrace();
+                     return;
+                }
+
+
             }
         });
-
-
         // Inflate the layout for this fragment
         return view;
+
     }
 
 
 
-
+        public void toastMessage(String message){
+            Toast.makeText(getActivity(),message,Toast.LENGTH_LONG).show();
+        }
 
 
 }

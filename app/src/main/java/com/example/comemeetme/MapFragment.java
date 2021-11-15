@@ -1,5 +1,6 @@
 package com.example.comemeetme;
 
+import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
@@ -10,9 +11,11 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,40 +29,61 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class MapFragment extends Fragment {
 
     private MapView mapView;
+    private ArrayList<HashMap<String, String>> output = new ArrayList<>();
     private static final String SOURCE_ID = "SOURCE_ID";
     private static final String ICON_ID = "ICON_ID";
     private static final String LAYER_ID = "LAYER_ID";
     FusedLocationProviderClient mFusedLocationClient;
+    LocationEngine locationEngine;
 
-    public MapFragment() {
+    private PermissionsManager permissionsManager;
+    private LocationComponent locationComponent;
+    Location originLayout;
+
+    private MapboxMap mapboxMap;
+    private MapboxMap mapboxMap1;
+    public MapFragment(){
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        Mapbox.getInstance(getContext().getApplicationContext(), getString(R.string.mapbox_access_token));
-        View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        getEvents();
+        Mapbox.getInstance(getContext().getApplicationContext(),getString(R.string.mapbox_access_token));
+        View view = inflater.inflate(R.layout.fragment_map,container,false);
 
         mapView = (MapView) view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -87,7 +111,7 @@ public class MapFragment extends Fragment {
                             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(latLng)      // Sets the center of the map to Mountain View
-                                    .zoom(12)                  // Sets the tilt of the camera to 30 degrees
+                                    .zoom(5)                  // Sets the tilt of the camera to 30 degrees
                                     .build();                   // Creates a CameraPosition from the builder
 
                             mapboxMap.setCameraPosition(cameraPosition);
@@ -95,12 +119,8 @@ public class MapFragment extends Fragment {
                     }
                 });
                 List<Feature> symbolLayerIconFeatureList = new ArrayList<>();
-                symbolLayerIconFeatureList.add(Feature.fromGeometry(
-                        Point.fromLngLat(-57.225365, -33.213144)));
-                symbolLayerIconFeatureList.add(Feature.fromGeometry(
-                        Point.fromLngLat(-54.14164, -33.981818)));
-                symbolLayerIconFeatureList.add(Feature.fromGeometry(
-                        Point.fromLngLat(-56.990533, -30.583266)));
+
+
 
                 mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/mapbox/cjf4m44iw0uza2spb3q0a7s41")
 
@@ -126,7 +146,9 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
 
-// Map is set up and the style has loaded. Now you can add additional data or make other map adjustments.
+                        mapboxMap1 = mapboxMap;
+
+
 
 
                     }
@@ -134,7 +156,52 @@ public class MapFragment extends Fragment {
             }
         });
 
+        Button buttonFindEvents = view.findViewById(R.id.buttonAddPins);
+        buttonFindEvents.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                addPins();
+            }
+
+
+        });
+
         return view;
+    }
+    public void addPins(){
+        ArrayList<ArrayList<Double>> coords = updateMap();
+
+        // Use a layer manager here
+        // create symbol manager object
+
+
+        // add click listeners if desired
+        SymbolManager symbolManager = new SymbolManager(mapView, mapboxMap1, mapboxMap1.getStyle());
+
+
+        // set non-data-driven properties, such as:
+        symbolManager.setIconAllowOverlap(true);
+        symbolManager.setIconTranslate(new Float[]{-4f,5f});
+        symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
+
+        symbolManager.setIconAllowOverlap(true);
+        symbolManager.setIconIgnorePlacement(true);
+
+        for(int i = 0; i < coords.size(); i++){
+
+            ArrayList<Double> temp = coords.get(i);
+            Log.i("Coords " + i, temp.get(0) + ", " + temp.get(1));
+            // Add symbol at specified lat/lon
+            toastMessage("" + coords.get(0));
+            Symbol symbol = symbolManager.create(new SymbolOptions()
+                    .withLatLng(new LatLng(temp.get(1), temp.get(0)))
+                    .withIconImage(ICON_ID)
+                    .withIconSize(2.0f));
+
+
+        }
+
     }
 
     private void requestNewLocationData() {
@@ -203,5 +270,89 @@ public class MapFragment extends Fragment {
         mapView.onDestroy();
 
     }
+
+    public ArrayList<ArrayList<Double>> updateMap(){
+
+        ArrayList<HashMap<String, String>> output1 = output;
+        Log.i("Event number " , ""+output1.size());
+        ArrayList<ArrayList<Double>> out = new ArrayList<>();
+        //ArrayList<Double> coords = new ArrayList<>();
+
+        for(int i = 0; i < output1.size(); i++){
+            ArrayList<Double> coords = new ArrayList<>();
+            HashMap<String, String> temp = output1.get(i);
+            String position = temp.get("Event Location");
+            Log.i("Event Locations: " , position);
+            //toastMessage(position);
+            String longi = position.substring(position.indexOf("longitude="), position.indexOf("latitude=") -3);
+            String lat = position.substring(position.indexOf("latitude="), position.indexOf("altitude=") -3);
+            longi = longi.substring(10);
+            lat = lat.substring(9);
+            double longitude = Double.parseDouble(longi);
+            double latitude = Double.parseDouble(lat);
+            //toastMessage(lat);
+            coords.add(longitude);
+            coords.add(latitude);
+            out.add(coords);
+
+
+        }
+
+        return out;
+
+
+
+
+
+    }
+    public void getEvents(){
+        DatabaseReference mDatabase;
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
+        //ArrayList<HashMap<String, String>> out = new ArrayList<>();
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot1) {
+                if(snapshot1.exists()){
+                    ArrayList<HashMap<String, String>> out = new ArrayList<>();
+                    for(DataSnapshot snapshot : snapshot1.getChildren()) {
+                        HashMap<String, String> temp = new HashMap<>();
+                        temp.put("Event Location", snapshot.child("Event Location").getValue(String.class));
+                        //toastMessage(temp.get("Event Location"));
+                        temp.put("Event Name", snapshot.getKey());
+                        temp.put("Event Description", snapshot.child("Event Description").getValue(String.class));
+                        temp.put("Event End Time", snapshot.child("Event End Time").getValue(String.class));
+                        temp.put("Number of People", snapshot.child("Number of People").getValue(String.class));
+                        temp.put("Event Owner", snapshot.child("Event Owner").getValue(String.class));
+
+
+                        out.add(temp);
+
+                    }
+                   // toastMessage(""+out.size());
+                    getMap(out);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+
+        });
+
+
+    }
+    public void toastMessage(String message){
+        Toast.makeText(getActivity(),message,Toast.LENGTH_SHORT).show();
+    }
+    public void getMap(ArrayList<HashMap<String, String>> temp){
+
+        output = temp;
+
+
+
+    }
+
 
 }

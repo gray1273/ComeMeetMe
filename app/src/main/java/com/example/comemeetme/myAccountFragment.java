@@ -52,33 +52,7 @@ public class myAccountFragment extends Fragment {
         showEmail.setText(user.getEmail());
         Button toLogOut = view.findViewById(R.id.buttonLogout);
         Button delete = view.findViewById(R.id.buttonDeleteAccount);
-        Button goToNew = view.findViewById(R.id.buttonCreateNewEvent);
-        Button goToEvents = view.findViewById(R.id.buttonGoToEvents);
-        goToEvents.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //startActivity(new Intent(MainActivity.this,loginActivity.class));
 
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, EventListFragment.class, null)
-                        .addToBackStack(null)
-                        .commit();
-
-            }
-        });
-
-        goToNew.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //startActivity(new Intent(MainActivity.this,loginActivity.class));
-
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, NewEventFragment.class, null)
-                        .addToBackStack(null)
-                        .commit();
-
-            }
-        });
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
