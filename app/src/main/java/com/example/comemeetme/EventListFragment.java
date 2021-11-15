@@ -134,20 +134,24 @@ public class EventListFragment extends Fragment {
                 output[3] =  numPar.getText().toString();
                 output[4] =  description.getText().toString();
                 geocode(output[1],output[0]);
-                if(user.getEmail().equals(tempMap.get("Event Owner"))) {
-                    mDatabase = FirebaseDatabase.getInstance().getReference().child("events").child(output[0]);
-                    mDatabase.child("Original Location").setValue(output[1]);
-                    mDatabase.child("Event End Time").setValue(output[2]);
-                    mDatabase.child("Event Description").setValue(output[4]);
-                    mDatabase.child("Number of People").setValue(output[3]);
-                    toastMessage("Entry has been updated");
-                    toastMessage("Event Updated");
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container_view, MapFragment.class, null)
-                            .addToBackStack(null)
-                            .commit();
+                if(user!=null) {
+                    if (user.getEmail().equals(tempMap.get("Event Owner"))) {
+                        mDatabase = FirebaseDatabase.getInstance().getReference().child("events").child(output[0]);
+                        mDatabase.child("Original Location").setValue(output[1]);
+                        mDatabase.child("Event End Time").setValue(output[2]);
+                        mDatabase.child("Event Description").setValue(output[4]);
+                        mDatabase.child("Number of People").setValue(output[3]);
+                        toastMessage("Entry has been updated");
+                        toastMessage("Event Updated");
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container_view, MapFragment.class, null)
+                                .addToBackStack(null)
+                                .commit();
+                    } else {
+                        toastMessage("Error: You do not have permission to update this event");
+                    }
                 }else{
-                    toastMessage("Error: You do not have permission to update this event");
+                    toastMessage("Error: Please log in or create account");
                 }
             }
         });
@@ -156,6 +160,7 @@ public class EventListFragment extends Fragment {
         deleteButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                if(user != null){
                 if(user.getEmail().equals(tempMap.get("Event Owner"))){
                     String title = eventName.getText().toString();
                     //title = title.substring(12);
@@ -177,6 +182,8 @@ public class EventListFragment extends Fragment {
                     }
                 }else{
                     toastMessage("Error: You do not have permission to delete this event");
+                }}else{
+                    toastMessage("Error: Please log in or create account");
                 }
 
             }
