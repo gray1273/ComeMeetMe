@@ -51,39 +51,8 @@ public class myAccountFragment extends Fragment {
         TextView showEmail = view.findViewById(R.id.textViewShowEmail);
         showEmail.setText(user.getEmail());
         Button toLogOut = view.findViewById(R.id.buttonLogout);
-        Button delete = view.findViewById(R.id.buttonDeleteAccount);
 
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //startActivity(new Intent(MainActivity.this,loginActivity.class));
-                /*String email = user.getEmail();
-                EditText confirmEmail = view.findViewById(R.id.editTextConfirmPass);
-                AuthCredential credential = EmailAuthProvider
-                        .getCredential(email, confirmEmail.getText().toString());
-                user.reauthenticate(credential)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                   @Override
-                                                   public void onComplete(@NonNull Task<Void> task) {
-                                                       user.delete()
-                                                               .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                   @Override
-                                                                   public void onComplete(@NonNull Task<Void> task) {
-                                                                       if (task.isSuccessful()) {
-                                                                           Log.i("", "User account deleted.");
-                                                                       }
-                                                                   }
-                                                               });
-                                                   }
-                                               });*/
-                toastMessage("Feature coming soon!");
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, LoginFragment.class, null)
-                        .addToBackStack(null)
-                        .commit();
 
-            }
-        });
         toLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

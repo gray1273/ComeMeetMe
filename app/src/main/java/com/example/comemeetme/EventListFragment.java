@@ -50,6 +50,7 @@ public class EventListFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private HashMap<String, String> tempMap = new HashMap<>();
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -89,10 +90,11 @@ public class EventListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         Bundle bundle = this.getArguments();
         long symbolID = bundle.getLong("symbolID");
         Log.i("Symbol ID: " , ""+symbolID);
-        HashMap<String, String> tempMap = new HashMap<>();
+
         ArrayList<HashMap<String, String>> importedMaps = (ArrayList<HashMap<String, String>>) bundle.getSerializable("array");
         for(int i = 0; i < importedMaps.size(); i++){
 
@@ -132,18 +134,21 @@ public class EventListFragment extends Fragment {
                 output[3] =  numPar.getText().toString();
                 output[4] =  description.getText().toString();
                 geocode(output[1],output[0]);
-
-                mDatabase = FirebaseDatabase.getInstance().getReference().child("events").child(output[0]);
-                mDatabase.child("Original Location").setValue(output[1]);
-                mDatabase.child("Event End Time").setValue(output[2]);
-                mDatabase.child("Event Description").setValue(output[4]);
-                mDatabase.child("Number of People").setValue(output[3]);
-                toastMessage("Entry has been updated");
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, MapFragment.class, null)
-                        .addToBackStack(null)
-                        .commit();
-
+                if(user.getEmail().equals(tempMap.get("Event Owner"))) {
+                    mDatabase = FirebaseDatabase.getInstance().getReference().child("events").child(output[0]);
+                    mDatabase.child("Original Location").setValue(output[1]);
+                    mDatabase.child("Event End Time").setValue(output[2]);
+                    mDatabase.child("Event Description").setValue(output[4]);
+                    mDatabase.child("Number of People").setValue(output[3]);
+                    toastMessage("Entry has been updated");
+                    toastMessage("Event Updated");
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_view, MapFragment.class, null)
+                            .addToBackStack(null)
+                            .commit();
+                }else{
+                    toastMessage("Error: You do not have permission to update this event");
+                }
             }
         });
         updateButton.setText("Update");
@@ -151,24 +156,29 @@ public class EventListFragment extends Fragment {
         deleteButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                String title = eventName.getText().toString();
-                //title = title.substring(12);
-                Log.i("title name = ",title);
-                toastMessage(title);
-                if(title.equalsIgnoreCase("Test")){
-                    toastMessage("Please do not delete the test event");
-                }else{
-                    DatabaseReference mDatabase;
-                    mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
-                    mDatabase = mDatabase.child(title);
-                    mDatabase.removeValue();
+                if(user.getEmail().equals(tempMap.get("Event Owner"))){
+                    String title = eventName.getText().toString();
+                    //title = title.substring(12);
+                    Log.i("title name = ",title);
+                    //toastMessage(title);
+                    if(title.equalsIgnoreCase("Test")){
+                        toastMessage("Please do not delete the test event");
+                    }else{
+                        DatabaseReference mDatabase;
+                        mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
+                        mDatabase = mDatabase.child(title);
+                        mDatabase.removeValue();
 
-                    toastMessage("Event Deleted");
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container_view, MapFragment.class, null)
-                            .addToBackStack(null)
-                            .commit();
+                        toastMessage("Event Deleted");
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container_view, MapFragment.class, null)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                }else{
+                    toastMessage("Error: You do not have permission to delete this event");
                 }
+
             }
         });
         deleteButton.setText("Delete");

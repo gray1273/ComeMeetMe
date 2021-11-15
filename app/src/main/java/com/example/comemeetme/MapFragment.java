@@ -113,7 +113,7 @@ public class MapFragment extends Fragment {
                             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(latLng)      // Sets the center of the map to Mountain View
-                                    .zoom(5)                  // Sets the tilt of the camera to 30 degrees
+                                    .zoom(10)                  // Sets the tilt of the camera to 30 degrees
                                     .build();                   // Creates a CameraPosition from the builder
 
                             mapboxMap.setCameraPosition(cameraPosition);
