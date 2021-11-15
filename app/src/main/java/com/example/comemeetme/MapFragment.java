@@ -101,6 +101,7 @@ public class MapFragment extends Fragment {
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for ActivityCompat#requestPermissions for more details.
+                    Log.i("Permissions", "Permission denied");
                     LatLng latLng = new LatLng(34.018321, -118.239886);
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(latLng)      // Sets the center of the map to Mountain View
@@ -114,6 +115,7 @@ public class MapFragment extends Fragment {
                             Location location = task.getResult();
                             if (location == null) {
 //                            requestNewLocationData();
+                                Log.i("Permissions", "Location = null");
                                 LatLng latLng = new LatLng(34.018321, -118.239886);
                                 CameraPosition cameraPosition = new CameraPosition.Builder()
                                         .target(latLng)      // Sets the center of the map to Mountain View
@@ -127,7 +129,7 @@ public class MapFragment extends Fragment {
                                         .target(latLng)      // Sets the center of the map to Mountain View
                                         .zoom(10)                  // Sets the tilt of the camera to 30 degrees
                                         .build();                   // Creates a CameraPosition from the builder
-
+                                Log.i("Permissions", "Permission allowed, tried to center on location");
                                 mapboxMap.setCameraPosition(cameraPosition);
                             }
                         }
