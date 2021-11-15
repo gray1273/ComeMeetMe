@@ -122,8 +122,7 @@ public class NewEventFragment extends Fragment {
                 EditText description = view.findViewById(R.id.editTextEventDescriptionMultiLine);
                 EditText numPeople = view.findViewById(R.id.editTextNumber);
                 EditText endTime = view.findViewById(R.id.editTextTime);
-               // CheckBox isPrivate = view.findViewById(R.id.checkBox);
-                TextView type = view.findViewById(R.id.HelperForSpinner);
+
 
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("events");
                     //boolean isPriv = isPrivate.isChecked();
