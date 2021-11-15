@@ -152,7 +152,7 @@ public class NewEventFragment extends Fragment {
                                     // Log the first results position.
                                     Position firstResultPos = results.get(0).asPosition();
                                     String eventLocationRes = firstResultPos.toString();
-                                    toastMessage("Location is " + eventLocationRes);
+                                    //toastMessage("Location is " + eventLocationRes);
 
                                     for (int i = 0; i < eventNameStr.length(); i++) {
                                         if (eventNameStr.charAt(i) >= 'a' && eventNameStr.charAt(i) <= 'z') {

@@ -67,6 +67,17 @@ public class ControlFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Button myAcc = view.findViewById(R.id.buttonMyAccount);
+        myAcc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container_view, myAccountFragment.class, null)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
         Button newEventButton = view.findViewById(R.id.newEventButton);
         newEventButton.setOnClickListener(new View.OnClickListener() {
             @Override

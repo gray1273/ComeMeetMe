@@ -8,12 +8,12 @@
     tools:context=".ControlFragment">
 
     <Button
-        android:id="@+id/friendsButton"
+        android:id="@+id/buttonMyAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/mapbox_blue"
         android:shadowColor="#3F51B5"
-        android:text="Friends"
+        android:text="My Account"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,6 +37,6 @@
         android:text="Events Map"
         app:layout_constraintEnd_toStartOf="@+id/newEventButton"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/friendsButton"
+        app:layout_constraintStart_toEndOf="@+id/buttonMyAccount"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
