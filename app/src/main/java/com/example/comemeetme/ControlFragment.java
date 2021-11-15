@@ -10,6 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.comemeetme.ui.login.LoginFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ControlFragment#newInstance} factory method to
@@ -72,10 +76,18 @@ public class ControlFragment extends Fragment {
         myAcc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_view, myAccountFragment.class, null)
-                        .addToBackStack(null)
-                        .commit();
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user != null) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_view, myAccountFragment.class, null)
+                            .addToBackStack(null)
+                            .commit();
+                }else{
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_view, LoginFragment.class, null)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         });
         Button newEventButton = view.findViewById(R.id.newEventButton);
