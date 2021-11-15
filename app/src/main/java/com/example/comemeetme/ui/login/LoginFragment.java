@@ -26,6 +26,7 @@ import com.example.comemeetme.MapFragment;
 import com.example.comemeetme.R;
 import com.example.comemeetme.databinding.FragmentLoginBinding;
 import com.example.comemeetme.ui.signup.signupFragment;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -40,6 +41,8 @@ public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    FusedLocationProviderClient mFusedLocationClient;
+    int PERMISSION_ID = 44;
 
     @Nullable
     @Override
@@ -80,7 +83,6 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
-
 
 
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), new Observer<LoginResult>() {
