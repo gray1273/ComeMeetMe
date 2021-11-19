@@ -103,7 +103,7 @@ public class NewEventFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
 
         Button mButton = view.findViewById(R.id.buttonCreateEvent);
@@ -112,6 +112,11 @@ public class NewEventFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user == null){
+                    toastMessage("Error: You have to be signed in to create an event");
+                    return;
+                }
                 Log.i("Test", "Recorded onClick");
                 DatabaseReference mDatabase;
                 boolean isAChar = false;
