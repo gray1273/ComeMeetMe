@@ -164,6 +164,7 @@ public class MapFragment extends Fragment {
                     public void onStyleLoaded(@NonNull Style style) {
 
                         mapboxMap1 = mapboxMap;
+                        //addPins();
 
 
 
@@ -293,6 +294,7 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mapView.onResume();
+
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.example.comemeetme;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -112,6 +114,13 @@ public class NewEventFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
+                ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo active = cm.getActiveNetworkInfo();
+                if(active == null){
+                    toastMessage("Error: Cannot connect to the internet");
+                    return;
+                }
+                //Check internet and return and print error if missing
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if(user == null){
                     toastMessage("Error: You have to be signed in to create an event");
@@ -178,6 +187,7 @@ public class NewEventFragment extends Fragment {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 toastMessage("Error: failed to create event");
+
                                             }
                                         });
                                         mDatabase.child("Original Location").setValue(eventLocationStr);
