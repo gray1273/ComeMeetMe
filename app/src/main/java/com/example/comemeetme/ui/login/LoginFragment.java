@@ -1,6 +1,9 @@
 package com.example.comemeetme.ui.login;
 
 import android.Manifest;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -149,6 +152,12 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo active = cm.getActiveNetworkInfo();
+                if(active == null){
+                    toastMessage("Error: Cannot connect to the internet");
+                    return;
+                }
                 Log.i("Log in", "Clicked login button");
                 String emailStr = usernameEditText.getText().toString();
                 String passStr = passwordEditText.getText().toString();

@@ -1,6 +1,9 @@
 package com.example.comemeetme;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,6 +60,12 @@ public class myAccountFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 //startActivity(new Intent(MainActivity.this,loginActivity.class));
+                ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo active = cm.getActiveNetworkInfo();
+                if(active == null){
+                    toastMessage("Error: Cannot connect to the internet");
+                    return;
+                }
                mAuth.signOut();
                 toastMessage("Signing out...");
                 getActivity().getSupportFragmentManager().beginTransaction()

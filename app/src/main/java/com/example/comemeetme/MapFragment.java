@@ -7,9 +7,12 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacem
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -82,7 +85,12 @@ public class MapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo active = cm.getActiveNetworkInfo();
+        if(active == null){
+            toastMessage("Error: Cannot connect to the internet");
 
+        }
         getEvents();
         Mapbox.getInstance(getContext().getApplicationContext(),getString(R.string.mapbox_access_token));
         View view = inflater.inflate(R.layout.fragment_map,container,false);

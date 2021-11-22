@@ -1,5 +1,8 @@
 package com.example.comemeetme;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -125,6 +128,12 @@ public class EventListFragment extends Fragment {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo active = cm.getActiveNetworkInfo();
+                if(active == null){
+                    toastMessage("Error: Cannot connect to the internet");
+                    return;
+                }
                 DatabaseReference mDatabase;
 
                 String[] output = new String[5];
@@ -160,6 +169,12 @@ public class EventListFragment extends Fragment {
         deleteButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo active = cm.getActiveNetworkInfo();
+                if(active == null){
+                    toastMessage("Error: Cannot connect to the internet");
+                    return;
+                }
                 if(user != null){
                 if(user.getEmail().equals(tempMap.get("Event Owner"))){
                     String title = eventName.getText().toString();
