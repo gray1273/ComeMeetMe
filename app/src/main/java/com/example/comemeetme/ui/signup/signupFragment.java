@@ -64,6 +64,7 @@ public class signupFragment extends Fragment {
         final EditText usernameEditText = binding.username;
         usernameEditText.setHint("e-mail");
         final EditText passwordEditText = binding.password;
+        final EditText confirmPasswordEditText = binding.confirmpassword;
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
         EditText confirmEmail;
@@ -88,7 +89,7 @@ public class signupFragment extends Fragment {
                         toastMessage("Emails do not match");
                     } else {
                         String pass1 = passwordEditText.getText().toString();
-                        String pass2 = passwordEditText.getText().toString();
+                        String pass2 = confirmPasswordEditText.getText().toString();
                         if (pass1.equals("") || pass2.equals("")) {
                             toastMessage("Please enter a password");
                         } else {
@@ -97,7 +98,7 @@ public class signupFragment extends Fragment {
                             } else {
                                 //Create new account using info
                                 if (pass1.length() < 6) {
-                                    toastMessage("Password is too short");
+                                    toastMessage("Password must be > 6 characters");
                                 } else {
                                     //mAuth.createUserWithEmailAndPassword(email1, pass1);
                                     mAuth.createUserWithEmailAndPassword(email1, pass1)
